@@ -195,6 +195,35 @@
   </div><!-- /.modal-dialog -->
 </div>
 
+<div id='chart-modal'  class="modal fade" tabindex="-1" role="dialog" aria-labelledby="aAddModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Reports for Activity/Domain/Service</h4>
+      </div>
+      <div class="modal-body">
+        <h3>Chart</h3>
+        <br/>
+        <img src='/img/chart.png'/>
+        <br/>
+        <h3>Report</h3>
+        <br/>
+        <p>Please tell me what kind of report goes here</p>
+        <br/>
+        <h3>Other stuff</h3>
+        <br/>
+        <p>Please tell me what other stuff to put here</p>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+
 <script type='text/javascript' src='/js/budget.js'></script>
 
 <?php
