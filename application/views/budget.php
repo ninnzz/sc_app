@@ -2,6 +2,70 @@
 	$this->load->view('includes/header');
 
 ?>
+<style>
+  .m-cont{
+    border-top:1px solid #4D4D4D;
+    margin-bottom: 20px;
+  }
+  .money-bar, .d-money-bar, .a-money-bar{
+    background-color: #4F8ABD;
+    text-decoration: none;
+    color:#fff;
+    padding:4px;
+    margin-right:5px;
+    border-radius: 5px;
+    font-size: 10px;
+  }
+  .d-money-bar{
+    background-color: #55BA4C;
+  }
+  .a-money-bar{
+    background-color: #FA3939;
+  }
+  .opc{
+    transition: opacity 200ms;
+    opacity: 1;
+  }
+  .opc:hover{
+    opacity: 0.7;
+    cursor: pointer;
+  }
+  .opc:click{
+    opacity: 0.5;
+  }
+  .money-bar:hover{
+    color:#C9C9C9;
+    text-decoration: none;
+  }
+  .header h3{
+    width:120px;
+  }
+  .money-bar span{
+    background-color: #fff;
+    color:#4F8ABD;
+    font-size: 9px;
+    width:70px;
+  }
+  .d-money-bar span{
+    background-color: #fff;
+    color:#55BA4C;
+    font-size: 9px;
+    width:70px; 
+  }
+  .a-money-bar span{
+    background-color: #fff;
+    color:#FA3939;
+    font-size: 9px;
+    width:70px; 
+  }
+  .service-header-menu{
+    list-style-type: none;
+    width:100%;
+  }
+  .service-header-menu li{
+    display: inline;
+  }
+</style>
 <script type='text/javascript'>
  var service_list = [];
  var domain_list = [];
@@ -34,7 +98,7 @@
 			</div>
 		<?php } ?>
   <div id='budget-div' class='row' style='width:100%;'>
-    <div class='col-s-12 col-md-8'>
+    <div class='col-s-12 col-md-12'>
       <div class='row' id='control-panel'>
         <div style='float:left;margin-left:10px;'>
           <button class='btn btn-info btn-xs' data-toggle="modal" href="#service-add">Add Service</button>
@@ -48,14 +112,12 @@
           <button  class='btn btn-danger btn-xs'>Activity</button>
         </div>
       </div>
+      <br/>
       <div class='row' id='content-panel'>
-
+    
       </div>
     </div>
   
-    <div id ='stats' class='col-s-12 col-md-4'>
-  
-    </div>
   </div> 
 </div>
 <div id='service-add' class="modal fade" tabindex="-1" role="dialog" aria-labelledby="sAddModal" aria-hidden="true">

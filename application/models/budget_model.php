@@ -22,8 +22,7 @@ class Budget_model extends CI_Model {
 		$id = $this->db->insert_id();
 		return $id;
 	}
-	public function get_item($table, $selectable, $where = null,$offset,$limit){
-		
+	public function get_items($table, $selectable, $where = null,$offset,$limit){
 		$this->db->select($selectable);
 		if($where != null){
 			$this->db->where($where);

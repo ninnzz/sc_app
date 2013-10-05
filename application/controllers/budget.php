@@ -14,8 +14,8 @@ class Budget extends CI_Controller {
 	public function index(){
 		$this->user_model->auth();
 		$user = $this->session->userdata['user'];
-		$service = $this->budget_model->get_item('service','id,name',null,null,null);
-		$domain = $this->budget_model->get_item('domain','id,name,service_id',null,null,null);
+		$service = $this->budget_model->get_items('service','id,name',null,null,null);
+		$domain = $this->budget_model->get_items('domain','id,name,service_id',null,null,null);
 		$this->load->view('budget',array('user'=>$user,'service_list'=>$service,'domain_list'=>$domain));
 	}
 	public function get_item(){
@@ -23,7 +23,18 @@ class Budget extends CI_Controller {
 		$user = $this->session->userdata['user'];
 		if($this->input->get('budget_level')){
 			if(in_array($user->scope, $this->allowed_scope)){
-
+				if($this->input->get('budget_level') == "service"){
+					$res = $this->budget_model->get_items('service','id,name,alloted,reserved,in_order,available',array('school_code'=>$user->school_code),null,null);
+					print_r(json_encode((object)array('status'=>'ok','message'=>'Service items','data'=>$res)));
+				} else if($this->input->get('budget_level') == "domain"){
+					$res = $this->budget_model->get_items('domain','id,service_id,name,alloted,reserved,in_order,available',array('school_code'=>$user->school_code,'service_id'=>$this->input->get('service_id')),null,null);
+					print_r(json_encode((object)array('status'=>'ok','message'=>'Domain items','data'=>$res)));
+				} else if($this->input->get('budget_level') == "activity"){
+					$res = $this->budget_model->get_items('activity','id,domain_id,title,alloted,reserved,in_order,available,color,acronym',array('school_code'=>$user->school_code,'domain_id'=>$this->input->get('domain_id')),null,null);
+					print_r(json_encode((object)array('status'=>'ok','message'=>'Activity items','data'=>$res)));
+				} else{
+					print_r((object)array('status'=>'error','message'=>'Invalid budget level'));	
+				}
 			} else{
 				print_r((object)array('status'=>'error','message'=>'Invalid scope for a user'));	
 			}
