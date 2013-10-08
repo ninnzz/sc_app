@@ -127,8 +127,8 @@ function activity_item(opt){
       router.setMethod('post');
       router.setTargetUrl(url);
       router.setParams(form_data);
-      events.setCurrentEvent("handle_input('domain',data)");
-      events.setErrorEvent("failed_input('domain',data)");
+      events.setCurrentEvent("handle_input('activity',data)");
+      events.setErrorEvent("failed_input('activity',data)");
       router.connect();
 
       /*******MAKING THE AJAX REQUEST*********/
@@ -147,6 +147,8 @@ function handle_input(level, data){
     document.getElementById('add-'+level+'-button').disabled = false;
     $('#'+level+'-add').modal('hide');
     if(level == "service"){
+      console.log(data);
+      util.appender(templates.service_tmp(data.data),'content-panel',0);     
       opt = document.createElement('option');
       opt2 = document.createElement('option');
       opt.innerHTML = data.data.name;
@@ -160,12 +162,23 @@ function handle_input(level, data){
       document.getElementById('input-service-name').value='';
       document.getElementById('input-service-allocated').value='';
     } else if(level == "domain"){
+      
+      console.log(data);
+      if(document.getElementById('service_body_'+data.data.service_id).getAttribute('data-loaded') == "1"){
+        util.appender(templates.domain_tmp(data.data),'service_body_'+data.data.service_id,1);     
+      } 
+
+
       domain_list.push([data.data.id,data.data.name,data.data.service_id]);
 
       document.getElementById('input-domain-name').value='';
       document.getElementById('input-domain-allocated').value='';
+    } else if(level == "activity"){
+      if(document.getElementById('domain_body_'+data.data.domain_id).getAttribute('data-loaded') == "1"){
+        util.appender(templates.activity_tmp(data.data),'domain_body_'+data.data.domain_id,1);     
+      } 
     }
-  },2000); 
+  },1000); 
 }
 function failed_input(level,data){
   console.log(data);
@@ -251,12 +264,16 @@ function handle_get(type,data,t_id){
         tmp.innerHTML = "&#8595;";
         tmp.setAttribute("onclick","hide_elem(this,'"+'service_body_'+data.data[i].service_id+"',1)");
         util.appender(templates.domain_tmp(data.data[i]),'service_body_'+data.data[i].service_id,1);     
+        document.getElementById('service_body_'+data.data[i].service_id).setAttribute('data-loaded','1');
+        document.getElementById('service_body_'+data.data[i].service_id).style.display = 'block';
       } else if(type == "activity"){
         var tmp = document.getElementById('adown_button_'+t_id);
         tmp.disabled = false;
         tmp.innerHTML = "&#8595;";
         tmp.setAttribute("onclick","hide_elem(this,'"+'domain_body_'+data.data[i].domain_id+"',1)");
         util.appender(templates.activity_tmp(data.data[i]),'domain_body_'+data.data[i].domain_id,1);     
+        document.getElementById('domain_body_'+data.data[i].domain_id).setAttribute('data-loaded','1');
+        document.getElementById('domain_body_'+data.data[i].domain_id).style.display = 'block';
       }
     }
   } else{
