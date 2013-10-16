@@ -30,7 +30,7 @@ class Budget extends CI_Controller {
 					$res = $this->budget_model->get_items('domain','id,service_id,name,alloted,reserved,in_order,available',array('school_code'=>$user->school_code,'service_id'=>$this->input->get('service_id')),null,null);
 					print_r(json_encode((object)array('status'=>'ok','message'=>'Domain items','data'=>$res)));
 				} else if($this->input->get('budget_level') == "activity"){
-					$res = $this->budget_model->get_items('activity','id,domain_id,title,alloted,reserved,in_order,available,color,acronym',array('school_code'=>$user->school_code,'domain_id'=>$this->input->get('domain_id')),null,null);
+					$res = $this->budget_model->get_items('activity','id,domain_id,service_id,title,alloted,reserved,in_order,available,color,acronym',array('school_code'=>$user->school_code,'domain_id'=>$this->input->get('domain_id')),null,null);
 					print_r(json_encode((object)array('status'=>'ok','message'=>'Activity items','data'=>$res)));
 				} else{
 					print_r((object)array('status'=>'error','message'=>'Invalid budget level'));	
@@ -46,8 +46,7 @@ class Budget extends CI_Controller {
 	public function add_item(){
 		$this->user_model->auth();
 		$user = $this->session->userdata['user'];
-		if(in_array($user->scope, $this->allowed_scope)){
-					
+		if(in_array($user->scope, $this->allowed_scope)){					
 			if($this->input->post('budget_level')){
 				$method = "input_".$this->input->post('budget_level');
 				if(method_exists($this, $method)){
@@ -74,15 +73,70 @@ class Budget extends CI_Controller {
 		} else{
 			print_r((object)array('status'=>'error','message'=>'Invalid scope for user'));
 		}
-		//use this someday..!!
-		// echo "<pre>".$str."</pre>";
+	}
+
+	public function delete_item(){
+		$this->user_model->auth();
+		$user = $this->session->userdata['user'];
+
+		if(in_array($user->scope, $this->allowed_scope)){					
+			if($this->input->post('budget_level')){
+				$t =$this->input->post('budget_level');
+				if($t == "service"){
+					$s1 = $this->budget_model->delete_item('activity',array('service_id'=>$this->input->post('id')));
+					print_r($s1);
+					$s2 = $this->budget_model->delete_item('domain',array('service_id'=>$this->input->post('id')));
+					print_r($s2);
+					$s3 = $this->budget_model->delete_item('service',array('id'=>$this->input->post('id')));
+					print_r($s3);
+					die();
+					print_r(json_encode((object)array('status'=>'deleted','type'=>'service')));
+				} else if($t == "domain"){
+					$this->budget_model->delete_item('activity',array('domain_id'=>$this->input->post('id')));
+					$t = $this->budget_model->delete_item('domain',array('id'=>$this->input->post('id')));
+					if($t){
+						$data2 = $this->adjust_budget('service',$this->input->post('service_id'));
+						$this->budget_model->update_item('service',$data2,array('id'=>$this->input->post('service_id')));
+						print_r(json_encode((object)array('status'=>'deleted','type'=>'domain','service'=>(object)array('id'=>$this->input->post('service_id'),'data'=>$data2))));
+					} else{
+						print_r((object)array('status'=>'error','message'=>'Error occured'));			
+					}
+					$this->adjust_budget('service',$this->input->post('service_id'));
+				} else if($t == "activity"){
+					$t = $this->budget_model->delete_item('activity',array('id'=>$this->input->post('id')));
+					if($t){
+						$data1 = $this->adjust_budget('domain',$this->input->post('domain_id'));
+						$this->budget_model->update_item('domain',$data1,array('id'=>$this->input->post('domain_id')));
+						$data2 = $this->adjust_budget('service',$this->input->post('service_id'));
+						$this->budget_model->update_item('service',$data2,array('id'=>$this->input->post('service_id')));
+						print_r(json_encode((object)array('status'=>'deleted','type'=>'activity','domain'=>(object)array('id'=>$this->input->post('domain_id'),'data'=>$data1),'service'=>(object)array('id'=>$this->input->post('service_id'),'data'=>$data2))));
+					} else{
+						print_r((object)array('status'=>'error','message'=>'Error occured'));			
+					}
+				} else{
+					print_r((object)array('status'=>'error','message'=>'Invalid budget level'));			
+				}
+			} else{
+				print_r((object)array('status'=>'error','message'=>'Invalid budget level'));			
+			}
+		} else{
+			print_r((object)array('status'=>'error','message'=>'Invalid scope for a user'));		
+		}
+
 	}
 
 	/*Budgeting functions*/
-	private function pre_get($budge_type){
-
-
-
+	private function adjust_budget($budge_type,$id){
+		$str = 'select sum(alloted) as alloted, sum(reserved) as reserved, sum(in_order) as in_order, sum(available) as available from ';
+		if($budge_type == "service"){
+			$str .= "domain where service_id = {$id} ;";
+			return $this->budget_model->adjust_budget($str);
+		} else if ($budge_type == "domain") {
+			$str .= "activity where domain_id = {$id} ;";
+			return $this->budget_model->adjust_budget($str);
+		} else{
+			return false;
+		}
 	}
 
 	private function input_service(){

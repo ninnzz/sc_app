@@ -31,7 +31,6 @@ function service_item(opt){
       }
 
       /*******MAKING THE AJAX REQUEST*********/
-
       router.setMethod('post');
       router.setTargetUrl(url);
       router.setParams(form_data);
@@ -298,4 +297,59 @@ function hide_elem(tmp,id,opt){
     document.getElementById(id).style.display = 'block';
     tmp.setAttribute("onclick","hide_elem(this,'"+id+"',1)");
   }
+}
+
+function deleteItem(obj,t_id,typ){
+  tmp = confirm("Are you sure you want to delete this item?");
+  tp = false;
+  var form_data;
+
+  if(tmp && typ === 'activity'){
+    service_id = obj.getAttribute('data-service-id');
+    domain_id = obj.getAttribute('data-domain-id');
+    form_data = {
+      budget_level : 'activity',
+      service_id : service_id,
+      domain_id : domain_id,
+      id : t_id
+    }
+    tp = true; 
+    events.setCurrentEvent("deleted('activity',data,'activity_"+t_id+"');");
+  } else if(tmp && typ === 'service'){
+    form_data = {
+      budget_level : 'service',
+      id : t_id
+    }
+    tp = true; 
+    events.setCurrentEvent("deleted('service',data,'service_"+t_id+"');");
+  } else if(tmp && typ === 'domain'){
+    service_id = obj.getAttribute('data-service-id');
+    form_data = {
+      budget_level : 'domain',
+      service_id : service_id,
+      id : t_id
+    }
+    tp = true; 
+    events.setCurrentEvent("deleted('domain',data,'domain_"+t_id+"');");
+  }
+
+
+  if(tmp && tp){
+    /*******MAKING THE AJAX REQUEST*********/
+    router.setMethod('post');
+    router.setTargetUrl("/budget/delete_item");
+
+    router.setParams(form_data);
+    events.setErrorEvent("console.log(data);");
+    router.connect();
+    /*******MAKING THE AJAX REQUEST*********/
+  }
+}
+
+function deleted(typ,data,target){
+  console.log(typ);
+  console.log(data);
+  console.log(target);
+  elem = document.getElementById(target);
+  elem.parentNode.removeChild(elem);
 }
